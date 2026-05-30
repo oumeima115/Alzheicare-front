@@ -8,38 +8,48 @@ type Tab = 'login' | 'register'
 
 export default function DoctorAuth() {
   const [tab, setTab] = useState<Tab>('login')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [licenseNumber, setLicenseNumber] = useState('')
   const navigate = useNavigate()
   const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault()
-  try {
-    const response = await fetch('http://localhost:8000/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    })
-    const data = await response.json()
-    login(data.token, data.user)
-    navigate(data.user.role === 'doctor' ? '/doctor/dashboard' : '/caregiver/dashboard')
-  } catch (error) {
-    console.error('Login failed:', error)
+    e.preventDefault()
+    try {
+      const url = tab === 'login' ? 'http://localhost:8000/auth/login' : 'http://localhost:8000/auth/register'
+      const body = tab === 'login'
+        ? { email, password }
+        : { name, lastName, email, password, licenseNumber }
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const data = await response.json()
+      login(data.token, data.user)
+      navigate(data.user.role === 'doctor' ? '/doctor/dashboard' : '/caregiver/dashboard')
+    } catch (error) {
+      console.error('Auth failed:', error)
+    }
   }
-}
 
   const googleLogin = useGoogleLogin({
-  onSuccess: async (response) => {
-    const data = await fetch('http://localhost:8000/auth/google', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: response.access_token }),
-    }).then(r => r.json())
-    
-    login(data.token, data.user)
-    navigate(data.user.role === 'doctor' ? '/doctor/dashboard' : '/caregiver/dashboard')
-  },
-  onError: () => console.error('Google login failed'),
-})
+    onSuccess: async (response) => {
+      const data = await fetch('http://localhost:8000/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: response.access_token }),
+      }).then(r => r.json())
+
+      login(data.token, data.user)
+      navigate(data.user.role === 'doctor' ? '/doctor/dashboard' : '/caregiver/dashboard')
+    },
+    onError: () => console.error('Google login failed'),
+  })
 
   return (
     <div className="min-h-screen flex" style={{ background: '#f8faff' }}>
@@ -54,19 +64,12 @@ export default function DoctorAuth() {
       <div className="hidden lg:flex lg:w-2/5 flex-col items-center justify-center px-12 relative overflow-hidden"
         style={{ background: 'linear-gradient(160deg, #1a6fb5 0%, #1044a3 60%, #0d2f7a 100%)' }}
       >
-        {/* Decorative circles */}
         <div className="absolute top-[-80px] left-[-80px] w-72 h-72 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }} />
         <div className="absolute bottom-[-60px] right-[-60px] w-96 h-96 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }} />
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full" style={{ background: 'rgba(255,255,255,0.02)' }} />
 
-        {/* Logo */}
         <div className="relative z-10 flex flex-col items-center gap-6">
-          <img
-            src={logo}
-            alt="AlzheiCare"
-            className="w-64"
-            style={{ filter: 'brightness(0) invert(1)' }}
-          />
+          <img src={logo} alt="AlzheiCare" className="w-64" style={{ filter: 'brightness(0) invert(1)' }} />
           <div className="w-16 h-px bg-white/30" />
           <p className="text-white/60 text-sm tracking-widest uppercase text-center">
             Medical Doctor Portal
@@ -78,11 +81,8 @@ export default function DoctorAuth() {
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div
           className="w-full max-w-sm bg-white rounded-3xl p-8"
-          style={{
-            boxShadow: '0 25px 70px rgba(26,111,181,0.13), 0 8px 25px rgba(0,0,0,0.15)',
-          }}
+          style={{ boxShadow: '0 25px 70px rgba(26,111,181,0.13), 0 8px 25px rgba(0,0,0,0.15)' }}
         >
-          {/* Mobile logo */}
           <div className="flex justify-center mb-6 lg:hidden">
             <img src={logo} alt="AlzheiCare" className="h-7" />
           </div>
@@ -97,9 +97,7 @@ export default function DoctorAuth() {
                 key={t}
                 onClick={() => setTab(t)}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  tab === t
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-400 hover:text-gray-600'
+                  tab === t ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'
                 }`}
               >
                 {t === 'login' ? 'Login' : 'Register'}
@@ -110,27 +108,35 @@ export default function DoctorAuth() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
             {tab === 'register' && (
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Full Name</label>
-                <input
-                  type="text"
-                  placeholder="Dr. John Smith"
-                  className="w-full px-4 py-3 rounded-2xl text-sm text-gray-800 outline-none transition-all"
-                  style={{
-                    background: '#f8faff',
-                    border: '1.5px solid #e8eef8',
-                    boxShadow: 'inset 0 2px 4px rgba(26,111,181,0.04)',
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.border = '1.5px solid #1a6fb5'
-                    e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.08), 0 0 0 3px rgba(26,111,181,0.08)'
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.border = '1.5px solid #e8eef8'
-                    e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.04)'
-                  }}
-                />
-              </div>
+              <>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">First Name</label>
+                  <input
+                    type="text"
+                    placeholder="John"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-4 py-3 rounded-2xl text-sm text-gray-800 outline-none transition-all"
+                    style={{ background: '#f8faff', border: '1.5px solid #e8eef8', boxShadow: 'inset 0 2px 4px rgba(26,111,181,0.04)' }}
+                    onFocus={(e) => { e.target.style.border = '1.5px solid #1a6fb5'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.08), 0 0 0 3px rgba(26,111,181,0.08)' }}
+                    onBlur={(e) => { e.target.style.border = '1.5px solid #e8eef8'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.04)' }}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Last Name</label>
+                  <input
+                    type="text"
+                    placeholder="Smith"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="w-full px-4 py-3 rounded-2xl text-sm text-gray-800 outline-none transition-all"
+                    style={{ background: '#f8faff', border: '1.5px solid #e8eef8', boxShadow: 'inset 0 2px 4px rgba(26,111,181,0.04)' }}
+                    onFocus={(e) => { e.target.style.border = '1.5px solid #1a6fb5'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.08), 0 0 0 3px rgba(26,111,181,0.08)' }}
+                    onBlur={(e) => { e.target.style.border = '1.5px solid #e8eef8'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.04)' }}
+                  />
+                </div>
+              </>
             )}
 
             <div className="flex flex-col gap-1.5">
@@ -138,20 +144,12 @@ export default function DoctorAuth() {
               <input
                 type="email"
                 placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 rounded-2xl text-sm text-gray-800 outline-none transition-all"
-                style={{
-                  background: '#f8faff',
-                  border: '1.5px solid #e8eef8',
-                  boxShadow: 'inset 0 2px 4px rgba(26,111,181,0.04)',
-                }}
-                onFocus={(e) => {
-                  e.target.style.border = '1.5px solid #1a6fb5'
-                  e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.08), 0 0 0 3px rgba(26,111,181,0.08)'
-                }}
-                onBlur={(e) => {
-                  e.target.style.border = '1.5px solid #e8eef8'
-                  e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.04)'
-                }}
+                style={{ background: '#f8faff', border: '1.5px solid #e8eef8', boxShadow: 'inset 0 2px 4px rgba(26,111,181,0.04)' }}
+                onFocus={(e) => { e.target.style.border = '1.5px solid #1a6fb5'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.08), 0 0 0 3px rgba(26,111,181,0.08)' }}
+                onBlur={(e) => { e.target.style.border = '1.5px solid #e8eef8'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.04)' }}
               />
             </div>
 
@@ -160,75 +158,51 @@ export default function DoctorAuth() {
               <input
                 type="password"
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-2xl text-sm text-gray-800 outline-none transition-all"
-                style={{
-                  background: '#f8faff',
-                  border: '1.5px solid #e8eef8',
-                  boxShadow: 'inset 0 2px 4px rgba(26,111,181,0.04)',
-                }}
-                onFocus={(e) => {
-                  e.target.style.border = '1.5px solid #1a6fb5'
-                  e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.08), 0 0 0 3px rgba(26,111,181,0.08)'
-                }}
-                onBlur={(e) => {
-                  e.target.style.border = '1.5px solid #e8eef8'
-                  e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.04)'
-                }}
+                style={{ background: '#f8faff', border: '1.5px solid #e8eef8', boxShadow: 'inset 0 2px 4px rgba(26,111,181,0.04)' }}
+                onFocus={(e) => { e.target.style.border = '1.5px solid #1a6fb5'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.08), 0 0 0 3px rgba(26,111,181,0.08)' }}
+                onBlur={(e) => { e.target.style.border = '1.5px solid #e8eef8'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.04)' }}
               />
             </div>
 
+            {/* Doctor-specific: License Number */}
             {tab === 'register' && (
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Medical License Number</label>
                 <input
                   type="text"
                   placeholder="e.g. ML-2024-00123"
+                  value={licenseNumber}
+                  onChange={(e) => setLicenseNumber(e.target.value)}
                   className="w-full px-4 py-3 rounded-2xl text-sm text-gray-800 outline-none transition-all"
-                  style={{
-                    background: '#f8faff',
-                    border: '1.5px solid #e8eef8',
-                    boxShadow: 'inset 0 2px 4px rgba(26,111,181,0.04)',
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.border = '1.5px solid #1a6fb5'
-                    e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.08), 0 0 0 3px rgba(26,111,181,0.08)'
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.border = '1.5px solid #e8eef8'
-                    e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.04)'
-                  }}
+                  style={{ background: '#f8faff', border: '1.5px solid #e8eef8', boxShadow: 'inset 0 2px 4px rgba(26,111,181,0.04)' }}
+                  onFocus={(e) => { e.target.style.border = '1.5px solid #1a6fb5'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.08), 0 0 0 3px rgba(26,111,181,0.08)' }}
+                  onBlur={(e) => { e.target.style.border = '1.5px solid #e8eef8'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(26,111,181,0.04)' }}
                 />
               </div>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               className="w-full py-3 rounded-2xl text-sm font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-lg mt-1"
-              style={{
-                background: 'linear-gradient(135deg, #1a6fb5 0%, #1044a3 100%)',
-                boxShadow: '0 4px 15px rgba(26,111,181,0.35)',
-              }}
+              style={{ background: 'linear-gradient(135deg, #1a6fb5 0%, #1044a3 100%)', boxShadow: '0 4px 15px rgba(26,111,181,0.35)' }}
             >
               {tab === 'login' ? 'Login' : 'Create Account'}
             </button>
 
-            {/* Divider */}
             <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-gray-100" />
               <span className="text-xs text-gray-400">or</span>
               <div className="flex-1 h-px bg-gray-100" />
             </div>
 
-            {/* Google */}
             <button
               type="button"
               onClick={() => googleLogin()}
               className="flex items-center justify-center gap-3 w-full py-3 rounded-2xl text-sm font-medium text-gray-600 transition-all hover:scale-[1.02]"
-              style={{
-                border: '1.5px solid #e8eef8',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-              }}
+              style={{ border: '1.5px solid #e8eef8', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
             >
               <svg width="18" height="18" viewBox="0 0 48 48">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>

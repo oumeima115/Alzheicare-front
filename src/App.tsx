@@ -88,7 +88,7 @@ export default function App() {
         <Route path="/caregiver/calendar" element={<CaregiverCalendar />} />
         <Route path="/doctor/calendar" element={<DoctorCalendar />} />
         <Route path="/doctor/notifications" element={<DoctorNotifications />} />
-        <Route path="/caregiver/notifications" element={<CaregiverNotifications onSimulate={() => setGeofenceActive(true)} />}/>
+        <Route path="/caregiver/notifications" element={<CaregiverNotifications />}/>
         <Route path="/caregiver/ai" element={<AIAssistant role="caregiver" />} />
         <Route path="/doctor/ai" element={<AIAssistant role="doctor" />} />
         <Route path="/caregiver/chat" element={<CaregiverChat />} />

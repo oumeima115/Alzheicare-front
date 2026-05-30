@@ -8,22 +8,32 @@ type Tab = 'login' | 'register'
 
 export default function CaregiverAuth() {
   const [tab, setTab] = useState<Tab>('login')
-  const navigate = useNavigate()
+  const [email, setEmail] = useState('')       
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+const [lastName, setLastName] = useState('')  
+const navigate = useNavigate()
   const { login } = useAuth()
 
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault()
   try {
-    const response = await fetch('http://localhost:8000/auth/login', {
+    const url = tab === 'login' ? 'http://localhost:8000/auth/login' : 'http://localhost:8000/auth/register'
+    const body = tab === 'login'
+      ? { email, password }
+      : { name, lastName, email, password }
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify(body),
     })
     const data = await response.json()
     login(data.token, data.user)
     navigate(data.user.role === 'doctor' ? '/doctor/dashboard' : '/caregiver/dashboard')
   } catch (error) {
-    console.error('Login failed:', error)
+    console.error('Auth failed:', error)
   }
 }
 
@@ -111,34 +121,44 @@ export default function CaregiverAuth() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
             {tab === 'register' && (
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Full Name</label>
-                <input
-                  type="text"
-                  placeholder="Your full name"
-                  className="w-full px-4 py-3 rounded-2xl text-sm text-gray-800 outline-none transition-all"
-                  style={{
-                    background: '#f8faff',
-                    border: '1.5px solid #e8eef8',
-                    boxShadow: 'inset 0 2px 4px rgba(29,158,117,0.04)',
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.border = '1.5px solid #1d9e75'
-                    e.target.style.boxShadow = 'inset 0 2px 4px rgba(29,158,117,0.08), 0 0 0 3px rgba(29,158,117,0.08)'
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.border = '1.5px solid #e8eef8'
-                    e.target.style.boxShadow = 'inset 0 2px 4px rgba(29,158,117,0.04)'
-                  }}
-                />
-              </div>
-            )}
+  <>
+    <div className="flex flex-col gap-1.5">
+      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">First Name</label>
+      <input
+        type="text"
+        placeholder="First name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="w-full px-4 py-3 rounded-2xl text-sm text-gray-800 outline-none transition-all"
+        style={{ background: '#f8faff', border: '1.5px solid #e8eef8', boxShadow: 'inset 0 2px 4px rgba(29,158,117,0.04)' }}
+        onFocus={(e) => { e.target.style.border = '1.5px solid #1d9e75'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(29,158,117,0.08), 0 0 0 3px rgba(29,158,117,0.08)' }}
+        onBlur={(e) => { e.target.style.border = '1.5px solid #e8eef8'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(29,158,117,0.04)' }}
+      />
+    </div>
+
+    <div className="flex flex-col gap-1.5">
+      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Last Name</label>
+      <input
+        type="text"
+        placeholder="Last name"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
+        className="w-full px-4 py-3 rounded-2xl text-sm text-gray-800 outline-none transition-all"
+        style={{ background: '#f8faff', border: '1.5px solid #e8eef8', boxShadow: 'inset 0 2px 4px rgba(29,158,117,0.04)' }}
+        onFocus={(e) => { e.target.style.border = '1.5px solid #1d9e75'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(29,158,117,0.08), 0 0 0 3px rgba(29,158,117,0.08)' }}
+        onBlur={(e) => { e.target.style.border = '1.5px solid #e8eef8'; e.target.style.boxShadow = 'inset 0 2px 4px rgba(29,158,117,0.04)' }}
+      />
+    </div>
+  </>
+)}
 
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</label>
               <input
                 type="email"
                 placeholder="your@email.com"
+                value={email}
+onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 rounded-2xl text-sm text-gray-800 outline-none transition-all"
                 style={{
                   background: '#f8faff',
@@ -161,6 +181,8 @@ export default function CaregiverAuth() {
               <input
                 type="password"
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-2xl text-sm text-gray-800 outline-none transition-all"
                 style={{
                   background: '#f8faff',
