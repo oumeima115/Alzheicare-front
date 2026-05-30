@@ -209,7 +209,7 @@ export default function SleepTracker({
       <ResponsiveContainer width="100%" height={130}>
         <BarChart
           data={weekData}
-          onClick={(e) => {
+          onClick={(e: any) => {
             if (e?.activePayload?.[0]) {
               const r = e.activePayload[0].payload as SleepRecord
               setSelected((prev) => prev?.id === r.id ? null : r)

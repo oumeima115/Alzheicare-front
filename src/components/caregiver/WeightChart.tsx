@@ -30,7 +30,9 @@ export default function WeightChart({ data }: Props) {
   const [startIndex, setStartIndex] = useState(
     Math.max(0, data.length - WINDOW),
   );
+
   const [direction, setDirection] = useState<"left" | "right">("right");
+  if (!data || data.length === 0) return null
 
   const visibleData = data.slice(startIndex, startIndex + WINDOW);
   const canGoLeft = startIndex > 0;

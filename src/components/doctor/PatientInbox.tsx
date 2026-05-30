@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, Send, Phone, Video } from 'lucide-react'
+import { Search, Send } from 'lucide-react'
 
 interface Patient {
   id: number
@@ -175,14 +175,6 @@ export default function PatientInbox() {
               <p className="font-semibold text-gray-800 text-sm">{selected.name}</p>
               <p className="text-xs text-gray-400">Caregiver: {selected.caregiver}</p>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <button className="p-2 rounded-xl bg-[#1a6fb5]/10 text-[#1a6fb5] hover:bg-[#1a6fb5]/20 transition">
-              <Phone size={16} />
-            </button>
-            <button className="p-2 rounded-xl bg-[#1a6fb5]/10 text-[#1a6fb5] hover:bg-[#1a6fb5]/20 transition">
-              <Video size={16} />
-            </button>
           </div>
         </div>
 
