@@ -14,7 +14,7 @@ import DailyLogModal from "../../components/caregiver/DailyLogModal";
 import type { DailyLogInput } from "../../components/caregiver/DailyLogModal";
 import MoodTracker from "../../components/caregiver/MoodTracker";
 import type { MoodEntry } from "../../components/caregiver/moodTracker.types.ts";
-import { mockMoodEntries } from "/home/oumeima/alzheicare/Alzheicare-front/src/components/caregiver/moodTracker.types.ts";
+import { mockMoodEntries } from "../../components/caregiver/moodTracker.types.ts";
 
 // ── Types charts ──────────────────────────────────────────────────────────────
 

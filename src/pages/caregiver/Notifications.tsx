@@ -5,7 +5,6 @@ import {
   Pill,
   Calendar,
   UserCheck,
-  MapPin,
   Bell,
 } from "lucide-react";
 
@@ -18,9 +17,6 @@ interface Notification {
   read: boolean;
 }
 
-interface Props {
-  onSimulate: () => void;
-}
 
 const initialNotifications: Notification[] = [
   {
@@ -82,7 +78,7 @@ const typeConfig = {
 
 type Filter = "all" | "unread" | Notification["type"];
 
-export default function CaregiverNotifications({ onSimulate }: Props) {
+export default function CaregiverNotifications() {
   const [notifications, setNotifications] =
     useState<Notification[]>(initialNotifications);
   const [filter, setFilter] = useState<Filter>("all");
@@ -132,15 +128,7 @@ export default function CaregiverNotifications({ onSimulate }: Props) {
                 : "All caught up!"}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Simulate geofence alert button for demo */}
-            <button
-              onClick={onSimulate}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium text-red-500 bg-red-50 border border-red-100 hover:bg-red-100 transition"
-            >
-              <MapPin size={13} />
-              Simulate Alert
-            </button>
+          <div className="flex items-center gap-3">            
 
             {unreadCount > 0 && (
               <button

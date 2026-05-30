@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, FileText, Pencil, Check, X } from 'lucide-react'
-import type { MoodLevel, MoodEntry } from '/home/oumeima/alzheicare/Alzheicare-front/src/components/caregiver/moodTracker.types.ts'
-import { moodEmojis, moodLabels } from '/home/oumeima/alzheicare/Alzheicare-front/src/components/caregiver/moodTracker.types.ts'
+import type { MoodLevel, MoodEntry } from './moodTracker.types.ts'
+import { moodEmojis, moodLabels } from './moodTracker.types.ts'
 
 // ── Props ────────────────────────────────────────────────────────────────────
 interface MoodTrackerProps {

@@ -11,7 +11,7 @@ import {
   Home,
 } from "lucide-react";
 
-type ZoneStatus = "safe" | "warning" | "danger";
+type ZoneStatus = "safe" | "danger";
 
 interface PatientLocation {
   x: number;
@@ -19,6 +19,8 @@ interface PatientLocation {
   address: string;
   updatedAt: string;
 }
+
+
 
 const statusConfig: Record<
   ZoneStatus,
@@ -37,13 +39,6 @@ const statusConfig: Record<
     border: "border-emerald-200",
     icon: Shield,
   },
-  warning: {
-    label: "Near Zone Boundary",
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    icon: AlertTriangle,
-  },
   danger: {
     label: "Outside Safe Zone",
     color: "text-red-600",
@@ -53,7 +48,11 @@ const statusConfig: Record<
   },
 };
 
-export default function CaregiverLiveMap() {
+interface Props {
+  onDanger: () => void
+}
+
+export default function CaregiverLiveMap({ onDanger }: Props) {
   const [status, setStatus] = useState<ZoneStatus>("safe");
   const [location, setLocation] = useState<PatientLocation>({
     x: 52,
@@ -82,12 +81,12 @@ export default function CaregiverLiveMap() {
 
   const simulate = (newStatus: ZoneStatus) => {
     setStatus(newStatus);
+    if (newStatus === 'danger') onDanger()
     const positions: Record<
       ZoneStatus,
       { x: number; y: number; address: string }
     > = {
       safe: { x: 52, y: 48, address: "Avenue Bourguiba, Bou Salem" },
-      warning: { x: 68, y: 38, address: "Rue de la République, Bou Salem" },
       danger: { x: 80, y: 28, address: "Route Nationale 5, Bou Salem" },
     };
     setLocation((prev) => ({
@@ -297,9 +296,7 @@ export default function CaregiverLiveMap() {
                       className={`absolute inset-0 rounded-full animate-ping opacity-30 ${
                         status === "safe"
                           ? "bg-emerald-400"
-                          : status === "warning"
-                            ? "bg-amber-400"
-                            : "bg-red-500"
+                        : "bg-red-500"
                       }`}
                       style={{
                         width: "36px",
@@ -312,9 +309,7 @@ export default function CaregiverLiveMap() {
                       className={`w-7 h-7 rounded-full flex items-center justify-center shadow-lg ${
                         status === "safe"
                           ? "bg-emerald-500"
-                          : status === "warning"
-                            ? "bg-amber-500"
-                            : "bg-red-500"
+                        : "bg-red-500"
                       }`}
                     >
                       <MapPin size={14} className="text-white" />
@@ -423,7 +418,7 @@ export default function CaregiverLiveMap() {
                 Simulate Position
               </p>
               <div className="flex flex-col gap-2">
-                {(["safe", "warning", "danger"] as ZoneStatus[]).map((s) => (
+                {(["safe", "danger"] as ZoneStatus[]).map((s) => (
                   <button
                     key={s}
                     onClick={() => simulate(s)}
@@ -431,16 +426,12 @@ export default function CaregiverLiveMap() {
                       status === s
                         ? s === "safe"
                           ? "bg-emerald-500 text-white border-emerald-500"
-                          : s === "warning"
-                            ? "bg-amber-500 text-white border-amber-500"
-                            : "bg-red-500 text-white border-red-500"
+                          : "bg-red-500 text-white border-red-500"
                         : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
                     }`}
                   >
                     {s === "safe"
                       ? "✓ Inside Zone"
-                      : s === "warning"
-                        ? "⚠ Near Boundary"
                         : "✕ Outside Zone"}
                   </button>
                 ))}

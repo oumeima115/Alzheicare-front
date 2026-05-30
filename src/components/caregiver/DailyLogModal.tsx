@@ -309,21 +309,6 @@ export default function DailyLogModal({ onClose, onSubmit }: Props) {
             </div>
           </div>
 
-          {/* ── Additional Notes ── */}
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Additional Notes{' '}
-              <span className="text-gray-400 font-normal">(optional)</span>
-            </label>
-            <textarea
-              placeholder="Describe any notable events, reactions, or observations..."
-              value={moodNote}
-              onChange={(e) => setMoodNote(e.target.value)}
-              rows={3}
-              className="mt-1 w-full bg-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#1a6fb5] resize-none"
-            />
-          </div>
-
           {/* ── Error ── */}
           {error && (
             <p className="text-red-500 text-xs bg-red-50 px-4 py-2 rounded-xl">

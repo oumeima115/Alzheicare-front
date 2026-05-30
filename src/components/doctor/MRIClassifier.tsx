@@ -46,17 +46,39 @@ export default function MRIClassifier() {
     if (f) handleFile(f)
   }, [])
 
-  const classify = () => {
-    if (!file) return
-    setLoading(true)
-    setTimeout(() => {
-      const stages: Stage[] = ['Early', 'Moderate', 'Severe']
-      const stage = stages[Math.floor(Math.random() * stages.length)]
-      const confidence = Math.floor(Math.random() * 15) + 82
-      setResult({ stage, confidence })
-      setLoading(false)
-    }, 2000)
+  const classify = async () => {
+  if (!file) return
+
+  setLoading(true)
+  setResult(null)
+
+  const formData = new FormData()
+  formData.append('file', file)
+
+  try {
+    const response = await fetch('http://localhost:8000/predict', {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    setResult({
+      stage: data.stage,           // "Early" | "Moderate" | "Severe"
+      confidence: Math.round(data.confidence * 100),  // 0.91 → 91
+    })
+
+  } catch (error) {
+    console.error('Classification failed:', error)
+    setResult(null)
+  } finally {
+    setLoading(false)
   }
+} //Le backend doit retourner un JSON de cette forme: json{ "stage": "Moderate", "confidence": 0.91 }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">

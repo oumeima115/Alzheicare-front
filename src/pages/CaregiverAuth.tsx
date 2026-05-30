@@ -2,26 +2,44 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGoogleLogin } from '@react-oauth/google'
 import logo from '../assets/logo_alzheicare.png'
+import { useAuth } from '../context/AuthContext'
 
 type Tab = 'login' | 'register'
 
 export default function CaregiverAuth() {
   const [tab, setTab] = useState<Tab>('login')
   const navigate = useNavigate()
+  const { login } = useAuth()
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (tab === 'register') {
-      navigate('/caregiver/patient-form')
-    } else {
-      navigate('/caregiver/dashboard')
-    }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault()
+  try {
+    const response = await fetch('http://localhost:8000/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+    const data = await response.json()
+    login(data.token, data.user)
+    navigate(data.user.role === 'doctor' ? '/doctor/dashboard' : '/caregiver/dashboard')
+  } catch (error) {
+    console.error('Login failed:', error)
   }
+}
 
   const googleLogin = useGoogleLogin({
-    onSuccess: () => navigate('/caregiver/patient-form'),
-    onError: () => console.error('Google login failed'),
-  })
+  onSuccess: async (response) => {
+    const data = await fetch('http://localhost:8000/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: response.access_token }),
+    }).then(r => r.json())
+    
+    login(data.token, data.user)
+    navigate(data.user.role === 'doctor' ? '/doctor/dashboard' : '/caregiver/dashboard')
+  },
+  onError: () => console.error('Google login failed'),
+})
 
   return (
     <div className="min-h-screen flex" style={{ background: '#f8faff' }}>

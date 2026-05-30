@@ -5,6 +5,7 @@ import {
   ChevronLeft, ChevronRight
 } from 'lucide-react'
 import logo from '../../assets/logo_alzheicare.png'
+import { useAuth } from '../../context/AuthContext'
 
 const navItems = [
   { icon: MessageSquare, label: 'Patient Messages', path: '/doctor/dashboard' },
@@ -18,6 +19,7 @@ export default function DoctorSidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+const { logout } = useAuth()
 
   return (
     <aside
@@ -69,7 +71,7 @@ export default function DoctorSidebar() {
       {/* Logout */}
       <div className="px-2 py-4 border-t border-gray-100">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => { logout(); navigate('/') }}
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-red-50 hover:text-red-500 w-full transition-all"
         >
           <LogOut size={18} className="shrink-0" />

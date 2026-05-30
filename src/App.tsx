@@ -92,8 +92,7 @@ export default function App() {
         <Route path="/caregiver/ai" element={<AIAssistant role="caregiver" />} />
         <Route path="/doctor/ai" element={<AIAssistant role="doctor" />} />
         <Route path="/caregiver/chat" element={<CaregiverChat />} />
-        <Route path="/caregiver/map" element={<CaregiverLiveMap />} />
-        <Route path="/caregiver/network" element={<DoctorNetwork />} />
+        <Route path="/caregiver/map" element={<CaregiverLiveMap onDanger={() => setGeofenceActive(true)} />} />        <Route path="/caregiver/network" element={<DoctorNetwork />} />
         <Route path="/caregiver/games" element={<CaregiverGames/>} />
         <Route path="/doctor/mri" element={<DoctorMRI />} />
        </Routes>
